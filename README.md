@@ -6,25 +6,24 @@
 
 ## :: Data Set Information
   
-  - Data set collected using accelerometers from a Samsung Galaxy S II.
+  Data set collected using accelerometers from a Samsung Galaxy S II.
   - Full description at:
-  - http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+  http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
   - Project Data:
-  - https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
+    https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
 
 ## :: Files
 
 ### > run_analysis.R
 
   - R script used to retrieve, extract, translate data set into tidy data set.
-  
   - Steps taken to process data are commented in the script file.
-  - https://github.com/rafafukai/GettingAndCleaningDataProject/blob/master/run_analysis.R
+    https://github.com/rafafukai/GettingAndCleaningDataProject/blob/master/run_analysis.R
 
 ### > tidy.txt
 
   - Resulting file tidy data set.
-  - https://github.com/rafafukai/GettingAndCleaningDataProject/blob/master/tidy.txt
+    https://github.com/rafafukai/GettingAndCleaningDataProject/blob/master/tidy.txt
 
 ### > Coodbook.md
   
