@@ -9,5 +9,5 @@ domain           | Time domain signal or frequency domain signal (Time or Freque
 signal           | Acceleration signal (Body or Gravity)
 instrument       | Measuring instrument (Accelerometer, Gyroscope)
 jerk_ind         | Jerk signal indicator (Y/N)
-estimate_func    | Variable (Mean or SD)
+estimate_func    | Variable (mean() or std())
 axis             | 3-axial signals in the X, Y and Z directions (X, Y, or Z)
