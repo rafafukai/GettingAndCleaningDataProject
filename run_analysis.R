@@ -89,6 +89,7 @@ library(stringr)
     
     ## data frame
     dta.df <- as.data.frame.matrix(dta)
+    rm(dta)
 
 ## -----------------------------------------------------------------------------------------------------
 ## 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
@@ -108,21 +109,33 @@ library(stringr)
   ## merge data table with activity labels
   ## join done on activityId field, set in the prep section
   dta.df <- inner_join(dta.df, a_label)
+  rm(a_label)
   
 
 ##-----------------------------------------------------------------------------------------------------
 ## 4. Appropriately labels the data set with descriptive variable names. 
   
-  ## split variable string
-  dta.dft <- as.data.frame(str_match(dta.df$variable, "^(.*):(.*):(.*):(.*):(.*)-(.*)$")[,-1])
-  ##Time:Body:Accelerator:FALSE:mean()-X
+    ## split variable string
+    dta.dft <- as.data.frame(str_match(dta.df$variable, "^(.*):(.*):(.*):(.*):(.*)-(.*)$")[,-1])
+    ##Time:Body:Accelerator:FALSE:mean()-X
+    
+    ## update column names for variables
+    colnames(dta.dft)  <- c("domain", "signal", "instrument", "jerk_ind", "estimate_func", "axis")
+    
+    ## col bind dataset with variables
+    dta.final <- cbind(
+        dta.df[,1:2], activity = dta.df[,c("activity")], dta.dft, value = dta.df[,c("value")]
+        )
+    rm(dta.df)
+    rm(dta.dft)
   
-  ## update column names for variables
-  colnames(dta.dft)  <- c("domain", "signal", "instrument", "jerk_ind", "estimate_func", "axis")
-  
-  ## col bind dataset with variables
-  dta_final <- cbind(
-      dta.df[,1:2], activity = dta.df[,c("activity")], dta.dft, value = dta.df[,c("value")]
-      )
-  
-  
+## -----------------------------------------------------------------------------------------------------
+## 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+    
+    ## set group
+    grouped <- group_by(dta.final
+              ,subjectId,activity,domain, signal, instrument, jerk_ind, estimate_func, axis)
+    tidy_dta <- summarise(grouped, mean=mean(value))
+    
+    ## write data set for upload
+    write.table(tidy_dta, file = "tidy.txt", row.names = FALSE)
