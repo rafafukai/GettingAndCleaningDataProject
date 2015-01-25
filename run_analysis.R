@@ -2,7 +2,7 @@
 library(data.table)
 library(dplyr)
 library(reshape)
-
+library(stringr)
 
 ## -----------------------------------------------------------------------------------------------------
 ## Here are the data for the project:
@@ -55,27 +55,52 @@ library(reshape)
     
     ## row bind labels
     y_merge <- rbind(y_test, y_train)
+    rm(y_test)
+    rm(y_train)
     
     ## row bind test and train datasets
     x_merge <- rbind(x_test, x_train)
+    rm(x_test)
+    rm(x_train)
 
     ## row bind test and subject datasets
     s_merge <- rbind(s_test, s_train)
+    rm(s_test)
+    rm(s_train)
     
     ## col bind labels and dataset
     dta     <- cbind(s_merge, y_merge, x_merge)
+    rm(s_merge)
+    rm(x_merge)
+    rm(y_merge)
     
-    ## reshape data
+    ## variable names (for step 4)
+    names(dta) <- gsub("Acc-"     , "Accelerator:N:" , names(dta))
+    names(dta) <- gsub("Gyro-"    , "Gyroscope:N:"   , names(dta))
+    names(dta) <- gsub("AccJerk-" , "Accelerator:Y:" , names(dta))
+    names(dta) <- gsub("GyroJerk-", "Gyroscope:Y:"   , names(dta))
+    names(dta) <- gsub("^t"       , "Time:"          , names(dta))
+    names(dta) <- gsub("^f"       , "Frequency:"     , names(dta))
+    names(dta) <- gsub("Body"     , "Body:"          , names(dta))
+    names(dta) <- gsub("Gravity"  , "Gravity:"       , names(dta))
+
+    ## reshape data / tall&skinny
     dta <- melt(dta, id=c("subjectId","activityId"))
     
-    ## data fram
+    ## data frame
     dta.df <- as.data.frame.matrix(dta)
 
 ## -----------------------------------------------------------------------------------------------------
 ## 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
 
   ## mean/standard deviation:
-  dta.df <- merge(filter(dta.df, grepl('mean()', variable)),filter(dta.df, grepl('std()', variable)))
+  dta.df1 <- filter(dta.df, grepl("mean()", dta.df$variable))
+  dta.df2 <- filter(dta.df, grepl("std()" , dta.df$variable))
+  dta.df3 <- rbind(data.table(dta.df1), data.table(dta.df2))
+  rm(dta.df1)
+  rm(dta.df2)
+  dta.df <- as.data.frame.matrix(dta.df3)
+  rm(dta.df3)
   
 ##-----------------------------------------------------------------------------------------------------
 ## 3. Uses descriptive activity names to name the activities in the data set
@@ -83,8 +108,21 @@ library(reshape)
   ## merge data table with activity labels
   ## join done on activityId field, set in the prep section
   dta.df <- inner_join(dta.df, a_label)
+  
 
-
------------------------------------------------------------------------------------------------------
-  ## 4. Appropriately labels the data set with descriptive variable names. 
+##-----------------------------------------------------------------------------------------------------
+## 4. Appropriately labels the data set with descriptive variable names. 
+  
+  ## split variable string
+  dta.dft <- as.data.frame(str_match(dta.df$variable, "^(.*):(.*):(.*):(.*):(.*)-(.*)$")[,-1])
+  ##Time:Body:Accelerator:FALSE:mean()-X
+  
+  ## update column names for variables
+  colnames(dta.dft)  <- c("domain", "signal", "instrument", "jerk_ind", "estimate_func", "axis")
+  
+  ## col bind dataset with variables
+  dta_final <- cbind(
+      dta.df[,1:2], activity = dta.df[,c("activity")], dta.dft, value = dta.df[,c("value")]
+      )
+  
   
