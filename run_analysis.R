@@ -65,12 +65,26 @@ library(reshape)
     ## col bind labels and dataset
     dta     <- cbind(s_merge, y_merge, x_merge)
     
-    ## remove dupe columns
-    ##dta     <- dta[, !duplicated(colnames(dta))]
-    
-    ## factor subject id
-    ##dta$subjectId <- as.factor(dta$subjectId)
-
     ## reshape data
     dta <- melt(dta, id=c("subjectId","activityId"))
+    
+    ## data fram
+    dta.df <- as.data.frame.matrix(dta)
 
+## -----------------------------------------------------------------------------------------------------
+## 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
+
+  ## mean/standard deviation:
+  dta.df <- merge(filter(dta.df, grepl('mean()', variable)),filter(dta.df, grepl('std()', variable)))
+  
+##-----------------------------------------------------------------------------------------------------
+## 3. Uses descriptive activity names to name the activities in the data set
+  
+  ## merge data table with activity labels
+  ## join done on activityId field, set in the prep section
+  dta.df <- inner_join(dta.df, a_label)
+
+
+-----------------------------------------------------------------------------------------------------
+  ## 4. Appropriately labels the data set with descriptive variable names. 
+  
