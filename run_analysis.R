@@ -117,4 +117,4 @@ library(dplyr)
     
     dta.dt <- data.table(dta)
     tidy_dta <- dta.dt[, lapply(.SD, mean), by = c("subjectId,activity")]
-    write.table(tidy_dta, file = "Tidy.txt", row.names = FALSE)
+    write.table(tidy_dta, file = "tidy.txt", row.names = FALSE)
