@@ -17,11 +17,11 @@ library(dplyr)
     ## delete local file if already exists
     if (file.exists(dfile))
     {
-        ##file.remove(dfile)
+        file.remove(dfile)
     }
     
     ## download data
-    ##download.file(url,destfile = dfile)
+    download.file(url,destfile = dfile)
 
     ## unzip data (list files)
     ##unzip(dfile, list = TRUE)
@@ -117,4 +117,6 @@ library(dplyr)
     
     dta.dt <- data.table(dta)
     tidy_dta <- dta.dt[, lapply(.SD, mean), by = c("subjectId,activity")]
+
+## write data set for upload
     write.table(tidy_dta, file = "tidy.txt", row.names = FALSE)
