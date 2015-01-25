@@ -67,7 +67,9 @@ library(dplyr)
     
     ## remove dupe columns
     dta     <- dta[, !duplicated(colnames(dta))]
-
+    
+    ## factor subject id
+    dta$subjectId <- as.factor(dta$subjectId)
 
 ## -----------------------------------------------------------------------------------------------------
 ## 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
@@ -104,14 +106,15 @@ library(dplyr)
 ## -----------------------------------------------------------------------------------------------------
 ## 4. Appropriately labels the data set with descriptive variable names. 
 
-    ##
     names(dta) <- gsub("Acc" , "Accelerator", names(dta))
     names(dta) <- gsub("Mag" , "Magnitude", names(dta))
     names(dta) <- gsub("Gyro", "Gyroscope", names(dta))
     names(dta) <- gsub("^t"  , "time", names(dta))
     names(dta) <- gsub("^f"  , "frequency", names(dta))
-    dta$subjectId <- as.factor(dta$subjectId)
-
 
 ## -----------------------------------------------------------------------------------------------------
 ## 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+    
+    dta.dt <- data.table(dta)
+    tidy_dta <- dta.dt[, lapply(.SD, mean), by = c("subjectId,activity")]
+    write.table(tidy_dta, file = "Tidy.txt", row.names = FALSE)
