@@ -2,6 +2,24 @@
 library(data.table)
 library(dplyr)
 
+## Here are the data for the project:
+## step 0: getting file from url to local drive
+    
+    ## set local file name
+    dfile <- "gcd_dataset.zip"
+
+    ## set file url
+    url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+    
+    ## delete local file if already exists
+    if (file.exists(dfile))
+    {
+        file.remove(dfile)
+    }
+    
+    ## download data
+    download.file(url,destfile = dfile)
+
 
 ## You should create one R script called run_analysis.R that does the following. 
 ## 1. Merges the training and the test sets to create one data set.
