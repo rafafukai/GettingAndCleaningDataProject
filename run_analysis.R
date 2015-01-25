@@ -41,10 +41,13 @@ library(dplyr)
     ## features 'feat' table lists columns in test (561)
     colnames(x_test)  <- t(feat[2])
     colnames(x_train) <- t(feat[2])
-    colnames(y_test)  <- c("activity_id")
-    colnames(y_train) <- c("activity_id")
+    colnames(y_test)  <- c("activityId")
+    colnames(y_train) <- c("activityId")
     ## activity labels
-    colnames(a_label) <- c("activity_id","activity")
+    colnames(a_label) <- c("activityId","activity")
+    ## subject
+    colnames(s_test)  <- c("subjectId")
+    colnames(s_train) <- c("subjectId")
 
 ## -----------------------------------------------------------------------------------------------------
 ## You should create one R script called run_analysis.R that does the following. 
@@ -53,11 +56,14 @@ library(dplyr)
     ## row bind labels
     y_merge <- rbind(y_test, y_train)
     
-    ## row bind test and train datasets (10299 rows)
+    ## row bind test and train datasets
     x_merge <- rbind(x_test, x_train)
-  
+
+    ## row bind test and subject datasets
+    s_merge <- rbind(s_test, s_train)
+    
     ## col bind labels and dataset
-    dta     <- cbind(y_merge, x_merge)
+    dta     <- cbind(s_merge, y_merge, x_merge)
     
     ## remove dupe columns
     dta     <- dta[, !duplicated(colnames(dta))]
@@ -88,12 +94,24 @@ library(dplyr)
 ## 3. Uses descriptive activity names to name the activities in the data set
 
     ## merge data table with activity labels
-    ## join done on activity_id field, set in the prep section
+    ## join done on activityId field, set in the prep section
     dta <- inner_join(dta, a_label)
     
     ## factor activity
     dta$activity <- as.factor(dta$activity)
-
+    
+    
 ## -----------------------------------------------------------------------------------------------------
 ## 4. Appropriately labels the data set with descriptive variable names. 
+
+    ##
+    names(dta) <- gsub("Acc" , "Accelerator", names(dta))
+    names(dta) <- gsub("Mag" , "Magnitude", names(dta))
+    names(dta) <- gsub("Gyro", "Gyroscope", names(dta))
+    names(dta) <- gsub("^t"  , "time", names(dta))
+    names(dta) <- gsub("^f"  , "frequency", names(dta))
+    dta$subjectId <- as.factor(dta$subjectId)
+
+
+## -----------------------------------------------------------------------------------------------------
 ## 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
