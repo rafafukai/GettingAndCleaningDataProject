@@ -22,6 +22,7 @@ library(stringr)
     
     ## download data
     ##download.file(url,destfile = dfile)
+    rm(url)
 
     ## unzip data (list files)
     ##unzip(dfile, list = TRUE)
@@ -35,7 +36,7 @@ library(stringr)
     y_train <- read.table(unzip(dfile, "UCI HAR Dataset/train/y_train.txt"))
     x_train <- read.table(unzip(dfile, "UCI HAR Dataset/train/X_train.txt"))
     s_train <- read.table(unzip(dfile, "UCI HAR Dataset/train/subject_train.txt"))
-    
+    rm(dfile)
 
     ## process column names
     ## features 'feat' table lists columns in test (561)
@@ -48,6 +49,11 @@ library(stringr)
     ## subject
     colnames(s_test)  <- c("subjectId")
     colnames(s_train) <- c("subjectId")
+  
+    ## pre-filter columns for speed (will be used in cbind x test and train)
+    f1col <- filter(feat, grepl("mean()|std()", feat[,2]))
+    f1col <- f1col[,1]
+    rm(feat)
 
 ## -----------------------------------------------------------------------------------------------------
 ## You should create one R script called run_analysis.R that does the following. 
@@ -59,9 +65,10 @@ library(stringr)
     rm(y_train)
     
     ## row bind test and train datasets
-    x_merge <- rbind(x_test, x_train)
+    x_merge <- rbind(x_test[,f1col], x_train[,f1col])
     rm(x_test)
     rm(x_train)
+    rm(f1col)
 
     ## row bind test and subject datasets
     s_merge <- rbind(s_test, s_train)
@@ -136,6 +143,7 @@ library(stringr)
     grouped <- group_by(dta.final
               ,subjectId,activity,domain, signal, instrument, jerk_ind, estimate_func, axis)
     tidy_dta <- summarise(grouped, mean=mean(value))
+    rm(grouped)
     
     ## write data set for upload
     write.table(tidy_dta, file = "tidy.txt", row.names = FALSE)
