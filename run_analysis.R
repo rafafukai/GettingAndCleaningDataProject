@@ -1,7 +1,7 @@
 ## packages
 library(data.table)
 library(dplyr)
-
+library(reshape)
 
 
 ## -----------------------------------------------------------------------------------------------------
@@ -17,11 +17,11 @@ library(dplyr)
     ## delete local file if already exists
     if (file.exists(dfile))
     {
-        file.remove(dfile)
+        ##file.remove(dfile)
     }
     
     ## download data
-    download.file(url,destfile = dfile)
+    ##download.file(url,destfile = dfile)
 
     ## unzip data (list files)
     ##unzip(dfile, list = TRUE)
@@ -66,57 +66,11 @@ library(dplyr)
     dta     <- cbind(s_merge, y_merge, x_merge)
     
     ## remove dupe columns
-    dta     <- dta[, !duplicated(colnames(dta))]
+    ##dta     <- dta[, !duplicated(colnames(dta))]
     
     ## factor subject id
-    dta$subjectId <- as.factor(dta$subjectId)
+    ##dta$subjectId <- as.factor(dta$subjectId)
 
-## -----------------------------------------------------------------------------------------------------
-## 2. Extracts only the measurements on the mean and standard deviation for each measurement. 
+    ## reshape data
+    dta <- melt(dta, id=c("subjectId","activityId"))
 
-    ## mean:
-    ## get columns
-    dtaMean <- grep("mean()", names(dta), value = FALSE, fixed = TRUE)
-      dtaMean <- append(dtaMean, grep("gravityMean"      , names(dta), value = FALSE, fixed = TRUE))
-      dtaMean <- append(dtaMean, grep("tBodyAccMean"     , names(dta), value = FALSE, fixed = TRUE))
-      dtaMean <- append(dtaMean, grep("tBodyAccJerkMean" , names(dta), value = FALSE, fixed = TRUE))
-      dtaMean <- append(dtaMean, grep("tBodyGyroMean"    , names(dta), value = FALSE, fixed = TRUE))
-      dtaMean <- append(dtaMean, grep("tBodyGyroJerkMean", names(dta), value = FALSE, fixed = TRUE))
-    ## extract meas
-    meas_xMean <- dta[dtaMean]
-    
-    ## std:
-    ## get columns
-    dtaSTD <- grep("std()", names(dta), value = FALSE, fixed = TRUE)
-    ## extract meas
-    meas_xSTD <- dta[dtaSTD]
-
-
-## -----------------------------------------------------------------------------------------------------
-## 3. Uses descriptive activity names to name the activities in the data set
-
-    ## merge data table with activity labels
-    ## join done on activityId field, set in the prep section
-    dta <- inner_join(dta, a_label)
-    
-    ## factor activity
-    dta$activity <- as.factor(dta$activity)
-    
-    
-## -----------------------------------------------------------------------------------------------------
-## 4. Appropriately labels the data set with descriptive variable names. 
-
-    names(dta) <- gsub("Acc" , "Accelerator", names(dta))
-    names(dta) <- gsub("Mag" , "Magnitude", names(dta))
-    names(dta) <- gsub("Gyro", "Gyroscope", names(dta))
-    names(dta) <- gsub("^t"  , "time", names(dta))
-    names(dta) <- gsub("^f"  , "frequency", names(dta))
-
-## -----------------------------------------------------------------------------------------------------
-## 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-    
-    dta.dt <- data.table(dta)
-    tidy_dta <- dta.dt[, lapply(.SD, mean), by = c("subjectId,activity")]
-
-## write data set for upload
-    write.table(tidy_dta, file = "tidy.txt", row.names = FALSE)
