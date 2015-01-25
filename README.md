@@ -18,6 +18,7 @@
 
   R script used to retrieve, extract, translate data set into tidy data set.
   - Steps taken to process data are commented in the script file.
+  https://github.com/rafafukai/GettingAndCleaningDataProject/blob/master/run_analysis.R
 
 ### > tidy.txt
 
